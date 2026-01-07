@@ -1,0 +1,17 @@
+# Игнорировать keystore
+*.jks
+*.keystore
+*.properties
+# Игнорировать все возможные ключи
+keys/my-project-key.jks
+keys/
+keys/ad.txt
+keys/sha256.txt
+keys/keystore.properties
+secret/
+.buildozer/
+.venv/
+venv/
+blocks-venv/
+__pycache__/
+*.pyc

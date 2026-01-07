@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1030477742087",
+    "project_id": "sample-firebase-ai-app-718e4",
+    "storage_bucket": "sample-firebase-ai-app-718e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1030477742087:android:24e2984715025742af6aa2",
+        "android_client_info": {
+          "package_name": "Block.MyApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbjEH7TzQwK611QuKW6NkCQyhtThLS8qU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
