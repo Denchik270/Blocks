@@ -121,7 +121,7 @@ android.ndk = 23b
 android.ndk_path = /home/deni/Android/android-ndk-r23b
 #android.ndk_path = /home/deni/.buildozer/android/platform/android-sdk/ndk/25.2.9519653
 #p4a.local_ndk_path = /home/deni/.buildozer/android/platform/android-sdk/ndk/25.2.9519653
-p4a.branch = release-2022.10.22
+p4a.branch = v2023.05.21
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 #android.ndk_api = 21
