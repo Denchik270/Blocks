@@ -117,7 +117,7 @@ android.minapi = 21
 #android.sdk = 20
 
 # (str) Android NDK version to use
-android.ndk = 23b
+android.ndk = 25b
 android.ndk_path = /home/deni/Android/android-ndk-r23b
 #android.ndk_path = /home/deni/.buildozer/android/platform/android-sdk/ndk/25.2.9519653
 #p4a.local_ndk_path = /home/deni/.buildozer/android/platform/android-sdk/ndk/25.2.9519653
