@@ -42,6 +42,23 @@ jobs:
             libncurses5 libstdc++6 libffi-dev libssl-dev \
             autoconf automake libtool pkg-config zlib1g-dev
 
+      - name: Install Android SDK cmdline-tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk
+
+          curl -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip cmdline-tools.zip
+          mv cmdline-tools cmdline-tools/latest
+
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+
+
       - name: Install buildozer & deps
         run: |
           python -m pip install --upgrade pip
@@ -50,8 +67,10 @@ jobs:
           # Cython нужен p4a-коли? лучше заранее установить
           python -m pip install cython==0.29.36
 
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+      - name: Accept Android licenses
+        run: |
+          yes | sdkmanager --licenses
+
 
 
       - name: Build APK
