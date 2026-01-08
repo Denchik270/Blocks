@@ -42,15 +42,22 @@ jobs:
             libncurses5 libstdc++6 libffi-dev libssl-dev \
             autoconf automake libtool pkg-config zlib1g-dev
 
-      - name: Install buildozer (latest)
+      - name: Install buildozer & deps
         run: |
-          pip install --upgrade pip
-          pip install git+https://github.com/kivy/buildozer.git
+          python -m pip install --upgrade pip
+          # берем buildozer напрямую из репо (последняя версия)
+          python -m pip install git+https://github.com/kivy/buildozer.git
+          # Cython нужен p4a-коли? лучше заранее установить
+          python -m pip install cython==0.29.36
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses
 
 
       - name: Build APK
         run: |
           buildozer android debug
+          
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
