@@ -8,28 +8,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare python-for-android (pin to known tag)
+      - name: Prepare python-for-android (pin tag)
         run: |
           mkdir -p $HOME/.buildozer/android/platform
           cd $HOME/.buildozer/android/platform
           if [ -d python-for-android ]; then
             cd python-for-android
             git fetch --tags origin || true
-            git checkout v2023.05.21 || git switch --detach v2023.05.21 || true
+            git checkout v2023.05.21 || git switch --detach v2023.05.21
           else
             git clone https://github.com/kivy/python-for-android.git python-for-android
             cd python-for-android
             git fetch --tags origin
-            git checkout v2023.05.21 || git switch --detach v2023.05.21 || true
+            git checkout v2023.05.21 || git switch --detach v2023.05.21
           fi
-          # show commit for debug
           git rev-parse --short HEAD
 
-      - name: Set up Python
+      - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
@@ -37,30 +37,22 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y zip unzip openjdk-17-jdk \
+          sudo apt install -y \
+            zip unzip openjdk-17-jdk \
             libncurses5 libstdc++6 libffi-dev libssl-dev \
             autoconf automake libtool pkg-config zlib1g-dev
 
-      - name: Install Buildozer and tools
+      - name: Install Buildozer
         run: |
           python -m pip install --upgrade pip
           pip install buildozer==1.5.0 cython==0.29.36
 
-      - name: Show buildozer.spec (for debug)
-        run: |
-          echo "---- buildozer.spec ----"
-          sed -n '1,200p' buildozer.spec || true
-          echo "------------------------"
-
       - name: Build APK
-        env:
-          # если хочешь, можно указывать локальный p4a: (buildozer автоматически увидит ~/.buildozer/android/platform/python-for-android)
-          # P4A_DIR: $HOME/.buildozer/android/platform/python-for-android
         run: |
           buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: apk
+          name: BrainUp-APK
           path: bin/*.apk
