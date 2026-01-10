@@ -13,22 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare python-for-android (pin tag)
-        run: |
-          mkdir -p $HOME/.buildozer/android/platform
-          cd $HOME/.buildozer/android/platform
-          if [ -d python-for-android ]; then
-            cd python-for-android
-            git fetch --tags origin || true
-            git checkout v2023.05.21 || git switch --detach v2023.05.21
-          else
-            git clone https://github.com/kivy/python-for-android.git python-for-android
-            cd python-for-android
-            git fetch --tags origin
-            git checkout v2023.05.21 || git switch --detach v2023.05.21
-          fi
-          git rev-parse --short HEAD
-
       - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
@@ -38,46 +22,65 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
-            zip unzip openjdk-17-jdk \
-            libncurses5 libstdc++6 libffi-dev libssl-dev \
+            zip unzip curl git \
+            openjdk-17-jdk \
+            libncurses5 libstdc++6 \
+            libffi-dev libssl-dev \
             autoconf automake libtool pkg-config zlib1g-dev
 
-      - name: Install Android SDK cmdline-tools
+      # ================= ANDROID SDK =================
+      - name: Install Android SDK cmdline-tools (FIXED)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip curl
-
+          rm -rf $HOME/android-sdk
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME
 
-          curl -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip cmdline-tools.zip
+          curl -L -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q cmdline-tools.zip -d cmdline-tools-temp
 
-          mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          mv cmdline-tools-temp/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          rm -rf cmdline-tools-temp cmdline-tools.zip
 
           echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
 
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-31" \
+            "build-tools;33.0.2" \
+            "ndk;23.2.8568313"
 
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses
+
+      # ================= PYTHON / BUILDOZER =================
       - name: Install buildozer & deps
         run: |
           python -m pip install --upgrade pip
-          # берем buildozer напрямую из репо (последняя версия)
-          python -m pip install git+https://github.com/kivy/buildozer.git
-          # Cython нужен p4a-коли? лучше заранее установить
           python -m pip install cython==0.29.36
+          python -m pip install git+https://github.com/kivy/buildozer.git
 
-      - name: Accept Android licenses
+      - name: Prepare python-for-android (PINNED, WORKING)
         run: |
-          yes | sdkmanager --licenses
+          mkdir -p $HOME/.buildozer/android/platform
+          cd $HOME/.buildozer/android/platform
 
+          if [ ! -d python-for-android ]; then
+            git clone https://github.com/kivy/python-for-android.git
+          fi
 
+          cd python-for-android
+          git fetch --tags
+          git checkout v2023.05.21
+          git rev-parse --short HEAD
 
+      # ================= BUILD =================
       - name: Build APK
         run: |
-          buildozer android debug
-          
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
